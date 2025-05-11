@@ -1,7 +1,7 @@
 <?php
 // app/controllers/AuthController.php
 
-// Incluir funciones auxiliares y el modelo de usuario
+// Incluir funciones auxiliares y el modelo de usuario.
 require_once __DIR__ . '/../helpers/functions.php';
 require_once __DIR__ . '/../models/User.php';
 
@@ -28,20 +28,20 @@ class AuthController {
             $username = trim($_POST['username'] ?? '');
             $password = $_POST['password'] ?? '';
 
-            // Se usa el modelo User para buscar el usuario por nombre de usuario
+            // Se usa el modelo User para buscar el usuario por nombre de usuario.
             $user = User::findByUsername($this->db, $username);
 
-            // Verificar existencia del usuario y validar contraseña
-            if ($user && password_verify($password, $user['password'])) {
-                $_SESSION['user_id'] = $user['id'];
-                set_flash_message("Bienvenido, " . $user['name'], "success");
+            // Verificar existencia del usuario y validar contraseña usando notación de objeto.
+            if ($user && password_verify($password, $user->password)) {
+                $_SESSION['user_id'] = $user->id;
+                set_flash_message("Bienvenido, " . $user->name, "success");
                 redirect('dashboard.php');
             } else {
                 set_flash_message("Usuario o contraseña incorrectos", "error");
                 redirect('login.php');
             }
         } else {
-            // Si no es POST, se carga la vista de login
+            // Si no es POST, se carga la vista de login.
             require_once __DIR__ . '/../views/login.php';
         }
     }
@@ -62,7 +62,7 @@ class AuthController {
             $password        = $_POST['password'] ?? '';
             $confirmPassword = $_POST['confirm_password'] ?? '';
 
-            // Validación básica de campos vacíos
+            // Validación básica de campos vacíos.
             if (empty($name) || empty($email) || empty($username) || empty($password) || empty($confirmPassword)) {
                 set_flash_message("Todos los campos son obligatorios", "error");
                 redirect('register.php');
@@ -79,7 +79,7 @@ class AuthController {
                 redirect('register.php');
             }
 
-            // Encriptar la contraseña
+            // Encriptar la contraseña.
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
             // Crear el arreglo con los datos del nuevo usuario.
@@ -90,7 +90,7 @@ class AuthController {
                 'password' => $hashedPassword
             ];
 
-            // Utilizamos el método create del modelo User para insertar el usuario en la BD
+            // Utilizamos el método create del modelo User para insertar el usuario en la BD.
             if (User::create($this->db, $newUser)) {
                 set_flash_message("Registro exitoso. Ahora puedes iniciar sesión.", "success");
                 redirect('login.php');
@@ -112,7 +112,7 @@ class AuthController {
             session_start();
         }
         
-        // Destruir la sesión y redirigir a la página de login
+        // Destruir la sesión y redirigir a la página de login.
         session_destroy();
         redirect('login.php');
     }
