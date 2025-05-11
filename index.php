@@ -42,8 +42,8 @@ SQL;
     // Insertar un usuario de demostración
     $stmt = $db->prepare("INSERT INTO users (name, email, username, password) VALUES (?, ?, ?, ?)");
     $stmt->execute([
-        'Jose Vicente Carratalá',
-        'info@josevicentecarratala.com',
+        'Andrei Buga',
+        'bugaandrei1@gmail.com',
         'andrei',
         'andrei'
     ]);
@@ -280,7 +280,7 @@ if ($proyectoActivo) {
 <head>
     <meta charset="utf-8">
     <title>andrei | lavenderblush - Multiproyecto</title>
-    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <header>
