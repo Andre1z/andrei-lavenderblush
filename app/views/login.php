@@ -17,7 +17,7 @@ $flash = get_flash_message();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar sesión - andrei-lavenderblush</title>
     <!-- Enlace a la hoja de estilos específica para la autenticación -->
-    <link rel="stylesheet" href="/assets/css/auth.css">
+    <link rel="stylesheet" href="assets/css/auth.css">
 </head>
 <body>
     <div class="login-box">
@@ -36,7 +36,7 @@ $flash = get_flash_message();
             <input type="password" name="password" id="password" placeholder="Introduce tu contraseña" required>
             <button type="submit">Iniciar sesión</button>
         </form>
-        <p>¿No tienes cuenta? <a href="register.php">Regístrate aquí</a></p>
+        <p>¿No tienes cuenta? <a href="../app/views/register.php">Regístrate aquí</a></p>
     </div>
 </body>
 </html>

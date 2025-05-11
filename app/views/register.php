@@ -17,7 +17,7 @@ $flash = get_flash_message();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrarse - andrei-lavenderblush</title>
     <!-- Enlace a la hoja de estilos para la autenticación -->
-    <link rel="stylesheet" href="/assets/css/auth.css">
+    <link rel="stylesheet" href="../../public/assets/css/auth.css">
 </head>
 <body>
     <div class="register-box">
