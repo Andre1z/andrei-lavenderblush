@@ -42,8 +42,8 @@ SQL;
     // Insertar un usuario de demostración
     $stmt = $db->prepare("INSERT INTO users (name, email, username, password) VALUES (?, ?, ?, ?)");
     $stmt->execute([
-        'Jose Vicente Carratalá',
-        'info@josevicentecarratala.com',
+        'Andrei Buga',
+        'bugaandrei1@gmail.com',
         'andrei',
         'andrei'
     ]);
@@ -349,6 +349,6 @@ if ($mensajeFlash):
         </template>
     </main>
 </div>
-<script src="script.js"></script>
+<script src="scripts/script.js"></script>
 </body>
 </html>
