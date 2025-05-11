@@ -212,7 +212,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['ajax']) && $_GET['ajax'
     $salida = [];
     foreach ($rows as $row) {
         $salida[] = [
-            'className' => $row['class_name'],
+            'className'  => $row['class_name'],
             'properties' => json_decode($row['properties'], true),
             'methods'    => json_decode($row['methods'], true),
             'x'          => (float)$row['pos_x'],
@@ -311,7 +311,7 @@ if (!usuarioConectado()):
 </html>
 <?php
 exit;
-endif; // Fin de la pantalla de login
+endif;
 
 // Usuario autenticado: mostrar la interfaz principal.
 $stmt = $db->prepare("SELECT id, project_name FROM projects WHERE user_id = ?");
@@ -337,11 +337,7 @@ if ($proyectoActivo) {
     <meta charset="utf-8">
     <title>andrei | lavenderblush - Multiproyecto</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: Ubuntu, sans-serif;
             background: #fff;
@@ -361,10 +357,7 @@ if ($proyectoActivo) {
             align-items: center;
             justify-content: center;
         }
-        header img {
-            width: 60px;
-            margin-right: 20px;
-        }
+        header img { width: 60px; margin-right: 20px; }
         .flash-msg {
             color: green;
             font-weight: bold;
@@ -383,10 +376,7 @@ if ($proyectoActivo) {
             box-shadow: 4px 0 10px rgba(0,0,0,0.1);
             overflow-y: auto;
         }
-        nav h3 {
-            margin-bottom: 10px;
-            color: #c71585;
-        }
+        nav h3 { margin-bottom: 10px; color: #c71585; }
         nav form {
             background: #fff;
             padding: 10px;
@@ -394,11 +384,7 @@ if ($proyectoActivo) {
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0,0,0,0.05);
         }
-        nav label {
-            font-weight: bold;
-            margin-bottom: 5px;
-            display: block;
-        }
+        nav label { font-weight: bold; margin-bottom: 5px; display: block; }
         nav input[type="text"], nav select {
             width: 100%;
             padding: 6px;
@@ -419,8 +405,14 @@ if ($proyectoActivo) {
             cursor: pointer;
             font-weight: bold;
         }
-        nav button:hover, nav a.botón:hover {
-            background: #ff9ebe;
+        nav button:hover, nav a.botón:hover { background: #ff9ebe; }
+        /* Campo de búsqueda para filtrar clases */
+        #searchBox {
+            width: 100%;
+            padding: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
         main {
             flex: 1;
@@ -439,27 +431,36 @@ if ($proyectoActivo) {
             box-shadow: 0px 5px 25px rgba(0,0,0,0.2);
             overflow: hidden;
         }
-        .draggable .nombre {
+        /* Estilo para la cabecera de cada clase con botones de acción */
+        .header-clase {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             background: #c71585;
-            color: #fff;
             padding: 5px;
-            font-weight: bold;
-            text-align: center;
+            color: #fff;
         }
-        .draggable .propiedades, .draggable .metodos {
-            padding: 8px;
+        .header-clase .nombre {
+            flex: 1;
+            cursor: text;
         }
-        .draggable p {
-            font-weight: bold;
-            margin-bottom: 5px;
+        .header-clase .acciones button {
+            background: #fff;
+            border: none;
+            padding: 2px 6px;
+            margin-left: 5px;
+            cursor: pointer;
+            border-radius: 3px;
+            color: #c71585;
         }
-        .draggable ul {
-            padding-left: 20px;
-            list-style: disc;
+        .header-clase .acciones button:hover {
+            background: #ffa6c9;
+            color: #fff;
         }
-        .draggable ul li {
-            margin-bottom: 5px;
-        }
+        .propiedades, .metodos { padding: 8px; }
+        .propiedades p, .metodos p { font-weight: bold; margin-bottom: 5px; }
+        .propiedades ul, .metodos ul { padding-left: 20px; list-style: disc; }
+        .propiedades ul li, .metodos ul li { margin-bottom: 5px; }
         [contenteditable="true"]:empty:before {
             content: attr(placeholder);
             color: #aaa;
@@ -498,6 +499,8 @@ if ($mensajeFlash):
             <button type="submit">Abrir</button>
         </form>
         <?php endif; ?>
+        <!-- Campo de búsqueda para filtrar clases -->
+        <input type="text" id="searchBox" placeholder="Buscar clases...">
         <h3>Acciones</h3>
         <a href="#" class="botón" id="agregarClase">Añadir clase</a><br><br>
         <a href="#" class="botón" id="mostrarClases">Mostrar clases</a><br><br>
@@ -505,10 +508,16 @@ if ($mensajeFlash):
         <a href="?accion=logout" class="botón" style="background:red; color:#fff;">Salir</a>
     </nav>
     <main>
-        <!-- Plantilla para elementos de clase -->
+        <!-- Plantilla para elementos de clase con botones de eliminar y duplicar -->
         <template id="plantilla-clase">
             <article class="draggable" style="left:250px; top:250px;">
-                <div class="nombre" contenteditable="true" placeholder="Nombre de la clase">Clase</div>
+                <div class="header-clase">
+                    <div class="nombre" contenteditable="true" placeholder="Nombre de la clase">Clase</div>
+                    <div class="acciones">
+                        <button type="button" class="btnEliminar" title="Eliminar">X</button>
+                        <button type="button" class="btnDuplicar" title="Duplicar">D</button>
+                    </div>
+                </div>
                 <div class="propiedades">
                     <p>Propiedades</p>
                     <ul contenteditable="true" placeholder="Agrega propiedades">
@@ -525,6 +534,183 @@ if ($mensajeFlash):
         </template>
     </main>
 </div>
-<script src="script.js"></script>
+<script>
+// Función para aplicar la funcionalidad de arrastrar sobre un elemento
+function hacerArrastrable(el) {
+    let offsetX = 0, offsetY = 0, arrastrando = false;
+    el.addEventListener("mousedown", function(e) {
+        arrastrando = true;
+        offsetX = e.clientX - el.getBoundingClientRect().left;
+        offsetY = e.clientY - el.getBoundingClientRect().top;
+        el.style.cursor = "grabbing";
+        el.style.zIndex = 9999;
+    });
+    document.addEventListener("mousemove", function(e) {
+        if (!arrastrando) return;
+        el.style.left = (e.clientX - offsetX) + "px";
+        el.style.top = (e.clientY - offsetY) + "px";
+    });
+    document.addEventListener("mouseup", function() {
+        arrastrando = false;
+        el.style.cursor = "grab";
+        el.style.zIndex = 1;
+    });
+}
+
+// Función que agrega eventos extra (eliminar y duplicar) a cada clase (artículo)
+function attachExtraEvents(articulo) {
+    const btnEliminar = articulo.querySelector(".btnEliminar");
+    if (btnEliminar) {
+        btnEliminar.addEventListener("click", function(e) {
+            e.stopPropagation();
+            articulo.remove();
+        });
+    }
+    const btnDuplicar = articulo.querySelector(".btnDuplicar");
+    if (btnDuplicar) {
+        btnDuplicar.addEventListener("click", function(e) {
+            e.stopPropagation();
+            const clon = articulo.cloneNode(true);
+            clon.style.left = (parseInt(articulo.style.left, 10) + 20) + "px";
+            clon.style.top = (parseInt(articulo.style.top, 10) + 20) + "px";
+            document.querySelector("main").appendChild(clon);
+            hacerArrastrable(clon);
+            attachExtraEvents(clon);
+        });
+    }
+}
+
+// Función para recolectar la información de las clases que están en el DOM
+function obtenerClases() {
+    const lista = [];
+    document.querySelectorAll("article.draggable").forEach(function(articulo) {
+        const nombre = articulo.querySelector(".nombre")?.textContent.trim() || "Clase";
+        const propiedades = [];
+        articulo.querySelectorAll(".propiedades ul li").forEach(function(li) {
+            propiedades.push(li.textContent.trim());
+        });
+        const metodos = [];
+        articulo.querySelectorAll(".metodos ul li").forEach(function(li) {
+            metodos.push(li.textContent.trim());
+        });
+        const posX = parseInt(articulo.style.left, 10) || 250;
+        const posY = parseInt(articulo.style.top, 10) || 250;
+        lista.push({
+            className: nombre,
+            properties: propiedades,
+            methods: metodos,
+            x: posX,
+            y: posY
+        });
+    });
+    return lista;
+}
+
+// Función para enviar la información de clases al servidor (guardar)
+function guardarClases() {
+    const datos = obtenerClases();
+    fetch('index.php?ajax=guardar_clases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos)
+    })
+    .then(response => response.text())
+    .then(texto => {
+        alert(texto);
+        console.log(texto);
+    })
+    .catch(error => console.error("Error al guardar clases:", error));
+}
+
+// Función para cargar las clases desde el servidor y renderizarlas en el área de trabajo
+function cargarClases() {
+    fetch('index.php?ajax=cargar_clases')
+    .then(response => response.json())
+    .then(data => {
+        if (Array.isArray(data)) {
+            // Limpiar clases existentes
+            document.querySelectorAll("article.draggable").forEach(el => el.remove());
+            // Agregar cada clase
+            data.forEach(function(clase) {
+                const plantilla = document.getElementById("plantilla-clase");
+                const clon = plantilla.content.cloneNode(true);
+                const articulo = clon.querySelector("article");
+                // Asignar nombre
+                articulo.querySelector(".nombre").textContent = clase.className;
+                // Propiedades
+                const ulProps = articulo.querySelector(".propiedades ul");
+                ulProps.innerHTML = "";
+                (clase.properties || []).forEach(function(prop) {
+                    const li = document.createElement("li");
+                    li.textContent = prop;
+                    ulProps.appendChild(li);
+                });
+                // Métodos
+                const ulMets = articulo.querySelector(".metodos ul");
+                ulMets.innerHTML = "";
+                (clase.methods || []).forEach(function(met) {
+                    const li = document.createElement("li");
+                    li.textContent = met;
+                    ulMets.appendChild(li);
+                });
+                // Posición
+                articulo.style.left = (clase.x || 250) + "px";
+                articulo.style.top  = (clase.y || 250) + "px";
+                document.querySelector("main").appendChild(articulo);
+                hacerArrastrable(articulo);
+                attachExtraEvents(articulo);
+            });
+        } else if (data.error) {
+            console.warn(data.error);
+        }
+    })
+    .catch(error => console.error("Error cargando clases:", error));
+}
+
+// Evento para filtrar clases en tiempo real mediante el campo de búsqueda
+document.getElementById("searchBox").addEventListener("input", function() {
+    const filtro = this.value.toLowerCase();
+    document.querySelectorAll("article.draggable").forEach(function(articulo) {
+        const nombre = articulo.querySelector(".nombre")?.textContent.toLowerCase();
+        if (nombre && nombre.indexOf(filtro) !== -1) {
+            articulo.style.display = "";
+        } else {
+            articulo.style.display = "none";
+        }
+    });
+});
+
+// Configurar eventos y auto-guardado al cargar el DOM
+document.addEventListener("DOMContentLoaded", function() {
+    // Botón para agregar nueva clase
+    document.getElementById("agregarClase").addEventListener("click", function(e) {
+        e.preventDefault();
+        const plantilla = document.getElementById("plantilla-clase");
+        const clon = plantilla.content.cloneNode(true);
+        const articulo = clon.querySelector("article");
+        document.querySelector("main").appendChild(articulo);
+        hacerArrastrable(articulo);
+        attachExtraEvents(articulo);
+    });
+
+    // Botón para mostrar (listar en la consola) las clases
+    document.getElementById("mostrarClases").addEventListener("click", function(e) {
+        e.preventDefault();
+        console.log(obtenerClases());
+    });
+
+    // Botón para guardar las clases
+    document.getElementById("guardarClases").addEventListener("click", function(e) {
+        e.preventDefault();
+        guardarClases();
+    });
+
+    // Auto-guardado cada 30 segundos (30000 milisegundos)
+    setInterval(guardarClases, 30000);
+
+    // Cargar clases desde el servidor al iniciar
+    cargarClases();
+});
+</script>
 </body>
 </html>
