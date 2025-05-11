@@ -99,11 +99,11 @@ if (isset($_GET['accion']) && $_GET['accion'] === 'logout') {
 if (isset($_POST['accion']) && $_POST['accion'] === 'login') {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
-
+    
     $stmt = $db->prepare("SELECT * FROM users WHERE username = ?");
     $stmt->execute([$username]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    
     if ($user && $user['password'] === $password) {
         $_SESSION['user_id'] = $user['id'];
         redirigir('index.php');
@@ -166,13 +166,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['ajax']) && $_GET['ajax
         echo "Datos JSON inválidos.";
         exit;
     }
-
+    
     $db->beginTransaction();
     try {
         // Eliminar las clases anteriores del proyecto
         $delStmt = $db->prepare("DELETE FROM classes WHERE project_id = ?");
         $delStmt->execute([$projectId]);
-
+        
         // Insertar las nuevas definiciones de clases
         $insStmt = $db->prepare("INSERT INTO classes (project_id, class_name, properties, methods, pos_x, pos_y) VALUES (?, ?, ?, ?, ?, ?)");
         foreach ($clases as $clase) {
@@ -232,65 +232,73 @@ if (!usuarioConectado()):
     <meta charset="utf-8">
     <title>andrei | lavenderblush - Acceso</title>
     <style>
+        /* Nuevo estilo de login: Tema minimalista y moderno */
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Helvetica', sans-serif;
-            background: linear-gradient(120deg, #ffeef3, #ffdff0);
+            background: linear-gradient(135deg, #2a2a72, #009ffd);
             display: flex;
             align-items: center;
             justify-content: center;
             height: 100vh;
+            font-family: 'Roboto', sans-serif;
         }
         .login-container {
-            background: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.2);
-            max-width: 355px;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            max-width: 400px;
             width: 100%;
-        }
-        h1 {
             text-align: center;
+        }
+        .login-container h1 {
+            color: #2a2a72;
             margin-bottom: 20px;
         }
         .flash-msg {
-            color: red;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        label {
-            display: block;
-            margin: 10px 0 5px;
-        }
-        input[type="text"],
-        input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        button {
-            margin-top: 15px;
-            width: 100%;
-            padding: 10px;
-            background: #f8b2cd;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            color: #ff3333;
+            margin-bottom: 12px;
             font-weight: bold;
         }
-        button:hover {
-            background: #ffa6c9;
+        .login-container label {
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+            color: #2a2a72;
+        }
+        .login-container input[type="text"],
+        .login-container input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        .login-container button {
+            width: 100%;
+            padding: 12px;
+            background: #2a2a72;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .login-container button:hover {
+            background: #1d1d5e;
         }
         .login-container img {
-            width: 100%;
+            max-width: 80%;
             margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
 <div class="login-container">
+    <img src="lavenderblush.png" alt="Logo">
     <h1>andrei | lavenderblush</h1>
     <?php 
       $mensaje = getFlash();
@@ -298,7 +306,6 @@ if (!usuarioConectado()):
       <div class="flash-msg"><?= htmlspecialchars($mensaje) ?></div>
     <?php endif; ?>
     <form method="post">
-        <img src="lavenderblush.png" alt="Logo">
         <input type="hidden" name="accion" value="login">
         <label>Usuario</label>
         <input type="text" name="username" required>
@@ -337,29 +344,32 @@ if ($proyectoActivo) {
     <meta charset="utf-8">
     <title>andrei | lavenderblush - Multiproyecto</title>
     <style>
+        /* Nuevo estilo del área principal: Tema oscuro y moderno con tipografía Roboto */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: Ubuntu, sans-serif;
-            background: #fff;
-            color: #333;
+            font-family: 'Roboto', sans-serif;
+            background: #121212;
+            color: #e0e0e0;
             height: 100vh;
             display: flex;
             flex-direction: column;
         }
         header {
-            background: lavenderblush;
+            background: #1f1f1f;
             padding: 20px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            border-bottom: 2px solid #ddd;
             display: flex;
             align-items: center;
             justify-content: center;
+            border-bottom: 2px solid #333;
         }
-        header img { width: 60px; margin-right: 20px; }
+        header img {
+            width: 60px;
+            margin-right: 20px;
+        }
+        header { font-size: 28px; color: #61dafb; font-weight: bold; }
         .flash-msg {
-            color: green;
+            color: #66ff66;
             font-weight: bold;
             text-align: center;
             padding: 10px;
@@ -367,30 +377,41 @@ if ($proyectoActivo) {
         .contenedor {
             flex: 1;
             display: flex;
+            overflow: hidden;
         }
         nav {
             width: 250px;
-            background: linear-gradient(180deg, #fff0f5, #ffe1ec);
+            background: #1a1a1a;
             padding: 20px;
-            border-right: 2px solid #ddd;
-            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            border-right: 2px solid #333;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.8);
             overflow-y: auto;
         }
-        nav h3 { margin-bottom: 10px; color: #c71585; }
+        nav h3 {
+            margin-bottom: 10px;
+            color: #61dafb;
+        }
         nav form {
-            background: #fff;
+            background: #2a2a2a;
             padding: 10px;
             margin-bottom: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
-        nav label { font-weight: bold; margin-bottom: 5px; display: block; }
+        nav label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            color: #ccc;
+        }
         nav input[type="text"], nav select {
             width: 100%;
-            padding: 6px;
+            padding: 8px;
             margin-bottom: 10px;
-            border: 1px solid #ccc;
+            border: 1px solid #444;
             border-radius: 4px;
+            background: #333;
+            color: #e0e0e0;
         }
         nav button, nav a.botón {
             display: inline-block;
@@ -398,72 +419,93 @@ if ($proyectoActivo) {
             margin-right: 5px;
             border: none;
             border-radius: 4px;
-            background: #f8b2cd;
-            color: #333;
+            background: #61dafb;
+            color: #121212;
             text-decoration: none;
             text-align: center;
             cursor: pointer;
             font-weight: bold;
+            transition: background 0.3s;
         }
-        nav button:hover, nav a.botón:hover { background: #ff9ebe; }
-        /* Campo de búsqueda para filtrar clases */
+        nav button:hover, nav a.botón:hover {
+            background: #52c7e5;
+        }
+        /* Campo de búsqueda */
         #searchBox {
             width: 100%;
-            padding: 6px;
+            padding: 8px;
             margin-bottom: 20px;
-            border: 1px solid #ccc;
+            border: 1px solid #444;
             border-radius: 4px;
+            background: #333;
+            color: #e0e0e0;
         }
         main {
             flex: 1;
             position: relative;
-            background: #fafafa;
+            background: #181818;
             overflow-y: auto;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
         }
         .draggable {
             width: 220px;
             height: 320px;
             position: absolute;
-            background: #fff;
-            border: 2px solid lavenderblush;
+            background: #242424;
+            border: 2px solid #61dafb;
             border-radius: 8px;
-            box-shadow: 0px 5px 25px rgba(0,0,0,0.2);
+            box-shadow: 0px 5px 25px rgba(0,0,0,0.8);
             overflow: hidden;
+            transition: transform 0.2s;
         }
-        /* Estilo para la cabecera de cada clase con botones de acción */
+        .draggable:hover {
+            transform: scale(1.02);
+        }
+        /* Cabecera de clase con botones */
         .header-clase {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #c71585;
-            padding: 5px;
-            color: #fff;
+            background: #61dafb;
+            padding: 8px;
+            color: #121212;
         }
         .header-clase .nombre {
             flex: 1;
             cursor: text;
+            font-weight: bold;
         }
         .header-clase .acciones button {
-            background: #fff;
+            background: #121212;
             border: none;
-            padding: 2px 6px;
-            margin-left: 5px;
+            padding: 4px 8px;
+            margin-left: 4px;
             cursor: pointer;
-            border-radius: 3px;
-            color: #c71585;
+            border-radius: 4px;
+            color: #61dafb;
+            font-weight: bold;
+            transition: background 0.3s;
         }
         .header-clase .acciones button:hover {
-            background: #ffa6c9;
-            color: #fff;
+            background: #333;
         }
-        .propiedades, .metodos { padding: 8px; }
-        .propiedades p, .metodos p { font-weight: bold; margin-bottom: 5px; }
-        .propiedades ul, .metodos ul { padding-left: 20px; list-style: disc; }
-        .propiedades ul li, .metodos ul li { margin-bottom: 5px; }
+        .propiedades, .metodos {
+            padding: 12px;
+        }
+        .propiedades p, .metodos p {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .propiedades ul, .metodos ul {
+            padding-left: 20px;
+            list-style: disc;
+        }
+        .propiedades ul li, .metodos ul li {
+            margin-bottom: 6px;
+        }
         [contenteditable="true"]:empty:before {
             content: attr(placeholder);
-            color: #aaa;
+            color: #888;
         }
     </style>
 </head>
@@ -505,7 +547,7 @@ if ($mensajeFlash):
         <a href="#" class="botón" id="agregarClase">Añadir clase</a><br><br>
         <a href="#" class="botón" id="mostrarClases">Mostrar clases</a><br><br>
         <a href="#" class="botón" id="guardarClases">Guardar clases</a><br><br>
-        <a href="?accion=logout" class="botón" style="background:red; color:#fff;">Salir</a>
+        <a href="?accion=logout" class="botón" style="background:#d32f2f; color:#fff;">Salir</a>
     </nav>
     <main>
         <!-- Plantilla para elementos de clase con botones de eliminar y duplicar -->
@@ -534,183 +576,6 @@ if ($mensajeFlash):
         </template>
     </main>
 </div>
-<script>
-// Función para aplicar la funcionalidad de arrastrar sobre un elemento
-function hacerArrastrable(el) {
-    let offsetX = 0, offsetY = 0, arrastrando = false;
-    el.addEventListener("mousedown", function(e) {
-        arrastrando = true;
-        offsetX = e.clientX - el.getBoundingClientRect().left;
-        offsetY = e.clientY - el.getBoundingClientRect().top;
-        el.style.cursor = "grabbing";
-        el.style.zIndex = 9999;
-    });
-    document.addEventListener("mousemove", function(e) {
-        if (!arrastrando) return;
-        el.style.left = (e.clientX - offsetX) + "px";
-        el.style.top = (e.clientY - offsetY) + "px";
-    });
-    document.addEventListener("mouseup", function() {
-        arrastrando = false;
-        el.style.cursor = "grab";
-        el.style.zIndex = 1;
-    });
-}
-
-// Función que agrega eventos extra (eliminar y duplicar) a cada clase (artículo)
-function attachExtraEvents(articulo) {
-    const btnEliminar = articulo.querySelector(".btnEliminar");
-    if (btnEliminar) {
-        btnEliminar.addEventListener("click", function(e) {
-            e.stopPropagation();
-            articulo.remove();
-        });
-    }
-    const btnDuplicar = articulo.querySelector(".btnDuplicar");
-    if (btnDuplicar) {
-        btnDuplicar.addEventListener("click", function(e) {
-            e.stopPropagation();
-            const clon = articulo.cloneNode(true);
-            clon.style.left = (parseInt(articulo.style.left, 10) + 20) + "px";
-            clon.style.top = (parseInt(articulo.style.top, 10) + 20) + "px";
-            document.querySelector("main").appendChild(clon);
-            hacerArrastrable(clon);
-            attachExtraEvents(clon);
-        });
-    }
-}
-
-// Función para recolectar la información de las clases que están en el DOM
-function obtenerClases() {
-    const lista = [];
-    document.querySelectorAll("article.draggable").forEach(function(articulo) {
-        const nombre = articulo.querySelector(".nombre")?.textContent.trim() || "Clase";
-        const propiedades = [];
-        articulo.querySelectorAll(".propiedades ul li").forEach(function(li) {
-            propiedades.push(li.textContent.trim());
-        });
-        const metodos = [];
-        articulo.querySelectorAll(".metodos ul li").forEach(function(li) {
-            metodos.push(li.textContent.trim());
-        });
-        const posX = parseInt(articulo.style.left, 10) || 250;
-        const posY = parseInt(articulo.style.top, 10) || 250;
-        lista.push({
-            className: nombre,
-            properties: propiedades,
-            methods: metodos,
-            x: posX,
-            y: posY
-        });
-    });
-    return lista;
-}
-
-// Función para enviar la información de clases al servidor (guardar)
-function guardarClases() {
-    const datos = obtenerClases();
-    fetch('index.php?ajax=guardar_clases', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datos)
-    })
-    .then(response => response.text())
-    .then(texto => {
-        alert(texto);
-        console.log(texto);
-    })
-    .catch(error => console.error("Error al guardar clases:", error));
-}
-
-// Función para cargar las clases desde el servidor y renderizarlas en el área de trabajo
-function cargarClases() {
-    fetch('index.php?ajax=cargar_clases')
-    .then(response => response.json())
-    .then(data => {
-        if (Array.isArray(data)) {
-            // Limpiar clases existentes
-            document.querySelectorAll("article.draggable").forEach(el => el.remove());
-            // Agregar cada clase
-            data.forEach(function(clase) {
-                const plantilla = document.getElementById("plantilla-clase");
-                const clon = plantilla.content.cloneNode(true);
-                const articulo = clon.querySelector("article");
-                // Asignar nombre
-                articulo.querySelector(".nombre").textContent = clase.className;
-                // Propiedades
-                const ulProps = articulo.querySelector(".propiedades ul");
-                ulProps.innerHTML = "";
-                (clase.properties || []).forEach(function(prop) {
-                    const li = document.createElement("li");
-                    li.textContent = prop;
-                    ulProps.appendChild(li);
-                });
-                // Métodos
-                const ulMets = articulo.querySelector(".metodos ul");
-                ulMets.innerHTML = "";
-                (clase.methods || []).forEach(function(met) {
-                    const li = document.createElement("li");
-                    li.textContent = met;
-                    ulMets.appendChild(li);
-                });
-                // Posición
-                articulo.style.left = (clase.x || 250) + "px";
-                articulo.style.top  = (clase.y || 250) + "px";
-                document.querySelector("main").appendChild(articulo);
-                hacerArrastrable(articulo);
-                attachExtraEvents(articulo);
-            });
-        } else if (data.error) {
-            console.warn(data.error);
-        }
-    })
-    .catch(error => console.error("Error cargando clases:", error));
-}
-
-// Evento para filtrar clases en tiempo real mediante el campo de búsqueda
-document.getElementById("searchBox").addEventListener("input", function() {
-    const filtro = this.value.toLowerCase();
-    document.querySelectorAll("article.draggable").forEach(function(articulo) {
-        const nombre = articulo.querySelector(".nombre")?.textContent.toLowerCase();
-        if (nombre && nombre.indexOf(filtro) !== -1) {
-            articulo.style.display = "";
-        } else {
-            articulo.style.display = "none";
-        }
-    });
-});
-
-// Configurar eventos y auto-guardado al cargar el DOM
-document.addEventListener("DOMContentLoaded", function() {
-    // Botón para agregar nueva clase
-    document.getElementById("agregarClase").addEventListener("click", function(e) {
-        e.preventDefault();
-        const plantilla = document.getElementById("plantilla-clase");
-        const clon = plantilla.content.cloneNode(true);
-        const articulo = clon.querySelector("article");
-        document.querySelector("main").appendChild(articulo);
-        hacerArrastrable(articulo);
-        attachExtraEvents(articulo);
-    });
-
-    // Botón para mostrar (listar en la consola) las clases
-    document.getElementById("mostrarClases").addEventListener("click", function(e) {
-        e.preventDefault();
-        console.log(obtenerClases());
-    });
-
-    // Botón para guardar las clases
-    document.getElementById("guardarClases").addEventListener("click", function(e) {
-        e.preventDefault();
-        guardarClases();
-    });
-
-    // Auto-guardado cada 30 segundos (30000 milisegundos)
-    setInterval(guardarClases, 30000);
-
-    // Cargar clases desde el servidor al iniciar
-    cargarClases();
-});
-</script>
+<script src="script.js"></script>
 </body>
 </html>
