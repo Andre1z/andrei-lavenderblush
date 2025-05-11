@@ -1,0 +1,62 @@
+/* Nuevo estilo de login: Tema minimalista y moderno */
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #2a2a72, #009ffd);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: 'Roboto', sans-serif;
+        }
+        .login-container {
+            background: rgba(255, 255, 255, 0.92);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        .login-container h1 {
+            color: #2a2a72;
+            margin-bottom: 20px;
+        }
+        .flash-msg {
+            color: #ff3333;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+        .login-container label {
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+            color: #2a2a72;
+        }
+        .login-container input[type="text"],
+        .login-container input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        .login-container button {
+            width: 100%;
+            padding: 12px;
+            background: #2a2a72;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .login-container button:hover {
+            background: #1d1d5e;
+        }
+        .login-container img {
+            max-width: 80%;
+            margin-bottom: 20px;
+        }
