@@ -2,10 +2,11 @@
 /**
  * app/helpers/functions.php
  *
- * Este archivo contiene funciones auxiliares para la aplicación, tales como la conexión
- * a la base de datos SQLite, manejo de sesiones, redirección y mensajes flash.
+ * Funciones auxiliares para la aplicación, incluyendo:
+ * - Conexión a la base de datos SQLite
+ * - Manejo de sesiones, redirecciones y mensajes flash
  */
-
+ 
 // Inicia la sesión si aún no está iniciada.
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -13,22 +14,20 @@ if (session_status() === PHP_SESSION_NONE) {
 
 /**
  * Retorna una conexión PDO a la base de datos SQLite.
- * Si el archivo de la base de datos no existe, SQLite lo creará automáticamente.
+ * Si el archivo no existe, SQLite lo creará automáticamente.
  * Además, se asegura de que la tabla "users" exista.
  *
  * @return PDO
  */
 function getDBConnection() {
-    // Define la ruta del archivo de base de datos.
-    // Se almacenará en la carpeta "data" ubicada en la raíz del proyecto.
+    // La ruta se construye desde /app/helpers hacia /data/database.db
     $db_path = __DIR__ . '/../../data/database.db';
     
     try {
-        // Crea una nueva instancia de PDO para SQLite.
         $pdo = new PDO("sqlite:" . $db_path);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
-        // Crea la tabla "users" si no existe.
+        // Crear la tabla "users" si no existe
         $createUsersTableSQL = "CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
@@ -40,7 +39,7 @@ function getDBConnection() {
         
         return $pdo;
     } catch (PDOException $e) {
-        die("La conexión a la base de datos falló: " . $e->getMessage());
+        die("Error de conexión: " . $e->getMessage());
     }
 }
 
@@ -74,14 +73,14 @@ function redirect($url) {
 function set_flash_message($message, $type = "info") {
     $_SESSION['flash_message'] = [
         "message" => $message,
-        "type" => $type
+        "type"    => $type
     ];
 }
 
 /**
  * Recupera y elimina el mensaje flash almacenado en la sesión, si existe.
  *
- * @return array|null  Un array asociativo con 'message' y 'type' o null si no existe.
+ * @return array|null Un array con 'message' y 'type' o null si no existe.
  */
 function get_flash_message() {
     if (isset($_SESSION['flash_message'])) {
@@ -93,7 +92,7 @@ function get_flash_message() {
 }
 
 /**
- * Retorna el ID del usuario que ha iniciado sesión o null si no hay ninguno.
+ * Retorna el ID del usuario logueado, o null si no hay ninguno.
  *
  * @return int|null
  */
