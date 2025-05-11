@@ -1,65 +1,66 @@
 <?php
 // public/index.php
 
-// Incluir funciones auxiliares y, en consecuencia, iniciar la sesión.
+// Habilitar reporte de errores para ambiente de desarrollo
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Incluir funciones auxiliares (se inicia la sesión y se definen funciones de ayuda)
 require_once __DIR__ . '/../app/helpers/functions.php';
 
-// Obtener la acción a partir de la solicitud (puede provenir de GET o POST).
+// Obtener la acción desde GET o POST
 $action = $_REQUEST['action'] ?? '';
 
-// Enrutar la solicitud según la acción definida.
+// Incluir de forma centralizada los controladores necesarios
+require_once __DIR__ . '/../app/controllers/AuthController.php';
+require_once __DIR__ . '/../app/controllers/ProjectController.php';
+
+// Enrutar la solicitud según la acción definida
 switch ($action) {
 
     case 'login':
-        require_once __DIR__ . '/../app/controllers/AuthController.php';
         $authController = new AuthController();
         $authController->login();
         break;
 
     case 'register':
-        require_once __DIR__ . '/../app/controllers/AuthController.php';
         $authController = new AuthController();
         $authController->register();
         break;
 
     case 'logout':
-        require_once __DIR__ . '/../app/controllers/AuthController.php';
         $authController = new AuthController();
         $authController->logout();
         break;
 
     case 'create_project':
-        require_once __DIR__ . '/../app/controllers/ProjectController.php';
         $projectController = new ProjectController();
         $projectController->createProject();
         break;
 
     case 'select_project':
-        require_once __DIR__ . '/../app/controllers/ProjectController.php';
         $projectController = new ProjectController();
         $projectController->selectProject();
         break;
 
     case 'save_classes':
-        // Este endpoint es consumido vía AJAX para guardar los datos de las clases.
-        require_once __DIR__ . '/../app/controllers/ProjectController.php';
+        // Endpoint consumido vía AJAX para guardar datos de clases
         $projectController = new ProjectController();
         $projectController->saveClasses();
         break;
 
     case 'load_classes':
-        // Este endpoint es consumido vía AJAX para obtener los datos de las clases.
-        require_once __DIR__ . '/../app/controllers/ProjectController.php';
+        // Endpoint consumido vía AJAX para cargar datos de clases
         $projectController = new ProjectController();
         $projectController->loadClasses();
         break;
 
     default:
-        // Si el usuario ya está autenticado, mostrar el dashboard.
+        // Por defecto, si el usuario ya ha iniciado sesión, se muestra el dashboard;
+        // de lo contrario se muestra la vista de login.
         if (logged_in_user_id()) {
             require_once __DIR__ . '/../app/views/dashboard.php';
         } else {
-            // De lo contrario, mostrar la página de login.
             require_once __DIR__ . '/../app/views/login.php';
         }
         break;

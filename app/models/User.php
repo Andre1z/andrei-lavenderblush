@@ -2,7 +2,7 @@
 /**
  * app/models/User.php
  *
- * Modelo de la entidad User.
+ * Modelo para la entidad User.
  */
 class User {
 
@@ -15,9 +15,9 @@ class User {
     /**
      * Busca un usuario por su nombre de usuario.
      *
-     * @param PDO    $db
-     * @param string $username
-     * @return User|null
+     * @param PDO $db Conexión a la base de datos.
+     * @param string $username Nombre de usuario.
+     * @return User|null Instancia de User o null.
      */
     public static function findByUsername(PDO $db, $username) {
         $stmt = $db->prepare("SELECT * FROM users WHERE username = ?");
@@ -35,6 +35,4 @@ class User {
         }
         return null;
     }
-    
-    // Otros métodos y lógica del modelo...
 }

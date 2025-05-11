@@ -2,25 +2,26 @@
 /**
  * app/helpers/functions.php
  *
- * Funciones auxiliares para la aplicación, incluyendo:
- * - Conexión a la base de datos SQLite
- * - Manejo de sesiones, redirecciones y mensajes flash
+ * Funciones auxiliares que incluyen:
+ * - Conexión a la base de datos SQLite (crea el archivo en /data/database.db y la tabla users si no existe).
+ * - Manejo de sesiones.
+ * - Redirecciones.
+ * - Mensajes flash.
  */
- 
-// Inicia la sesión si aún no está iniciada.
+
+// Inicia la sesión si aún no se ha iniciado
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 /**
  * Retorna una conexión PDO a la base de datos SQLite.
- * Si el archivo no existe, SQLite lo creará automáticamente.
- * Además, se asegura de que la tabla "users" exista.
+ * Se crea la tabla "users" si no existe.
  *
  * @return PDO
  */
 function getDBConnection() {
-    // La ruta se construye desde /app/helpers hacia /data/database.db
+    // La ruta a la base de datos se construye desde /app/helpers hasta /data/database.db
     $db_path = __DIR__ . '/../../data/database.db';
     
     try {
@@ -44,20 +45,19 @@ function getDBConnection() {
 }
 
 /**
- * Verifica que el usuario haya iniciado sesión.
- * Si no es así, establece un mensaje flash y redirige a la página de login.
+ * Verifica que el usuario haya iniciado sesión, de lo contrario redirige a login.
  */
 function require_login() {
     if (!isset($_SESSION['user_id'])) {
         set_flash_message("Debes iniciar sesión para acceder a esta página.", "error");
-        redirect("login.php");
+        redirect("index.php?action=login");
     }
 }
 
 /**
  * Redirige a la URL indicada.
  *
- * @param string $url La URL destino.
+ * @param string $url La URL de destino.
  */
 function redirect($url) {
     header("Location: " . $url);
@@ -67,8 +67,8 @@ function redirect($url) {
 /**
  * Establece un mensaje flash en la sesión.
  *
- * @param string $message El contenido del mensaje.
- * @param string $type    El tipo de mensaje ("info", "success", "error").
+ * @param string $message El mensaje.
+ * @param string $type    Tipo: "info", "success", o "error".
  */
 function set_flash_message($message, $type = "info") {
     $_SESSION['flash_message'] = [
@@ -78,9 +78,9 @@ function set_flash_message($message, $type = "info") {
 }
 
 /**
- * Recupera y elimina el mensaje flash almacenado en la sesión, si existe.
+ * Recupera y elimina el mensaje flash, si existe.
  *
- * @return array|null Un array con 'message' y 'type' o null si no existe.
+ * @return array|null Array con 'message' y 'type' o null.
  */
 function get_flash_message() {
     if (isset($_SESSION['flash_message'])) {
@@ -92,7 +92,7 @@ function get_flash_message() {
 }
 
 /**
- * Retorna el ID del usuario logueado, o null si no hay ninguno.
+ * Retorna el ID del usuario logueado o null.
  *
  * @return int|null
  */

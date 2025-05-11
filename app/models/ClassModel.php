@@ -83,11 +83,11 @@ class ClassModel {
                 $insertStmt->execute([$projectId, $className, $props, $methods, $pos_x, $pos_y]);
             }
 
-            // Finaliza la transacción de manera exitosa.
+            // Finaliza la transacción exitosamente.
             $db->commit();
             return true;
         } catch (Exception $ex) {
-            // En caso de error, se revierte la transacción.
+            // En caso de error, revierte la transacción.
             $db->rollBack();
             throw new Exception("Error saving classes: " . $ex->getMessage(), 0, $ex);
         }

@@ -1,79 +1,99 @@
 <?php
+// app/models/Project.php
+
 /**
  * Class Project
  *
- * Representa un proyecto asociado a un usuario.
- * Los campos 'id', 'user_id' y 'project_name' corresponden a los de la tabla "projects".
+ * Representa un proyecto.
+ *
+ * La tabla "projects" en la base de datos se asume que tiene los siguientes campos:
+ * - id: Identificador único (INTEGER PRIMARY KEY AUTOINCREMENT)
+ * - title: Título del proyecto (TEXT NOT NULL)
+ * - description: Descripción del proyecto (TEXT)
+ * - created_at: Fecha y hora de creación (DATETIME DEFAULT CURRENT_TIMESTAMP)
  */
 class Project {
     public $id;
-    public $user_id;
-    public $project_name;
+    public $title;
+    public $description;
+    public $created_at;
 
     /**
-     * Constructor para inicializar un proyecto a partir de un arreglo asociativo.
+     * Constructor opcional para inicializar propiedades a partir de un arreglo asociativo.
      *
-     * @param array $data Datos iniciales del proyecto.
+     * @param array $data Datos iniciales.
      */
     public function __construct(array $data = []) {
-        $this->id           = $data['id'] ?? null;
-        $this->user_id      = $data['user_id'] ?? null;
-        $this->project_name = $data['project_name'] ?? '';
+        if (!empty($data)) {
+            $this->id          = $data['id'] ?? null;
+            $this->title       = $data['title'] ?? 'Sin título';
+            $this->description = $data['description'] ?? '';
+            $this->created_at  = $data['created_at'] ?? date('Y-m-d H:i:s');
+        }
     }
 
     /**
-     * Crea un nuevo proyecto en la base de datos.
+     * Crea la tabla "projects" si no existe.
      *
-     * @param PDO    $db          Instancia de la conexión a la base de datos.
-     * @param int    $userId      ID del usuario propietario del proyecto.
-     * @param string $projectName Nombre del proyecto.
-     *
-     * @return Project|null Retorna la instancia del proyecto recién creado, o null en caso de error.
+     * @param PDO $db Conexión a la base de datos.
      */
-    public static function create(PDO $db, int $userId, string $projectName): ?Project {
-        $stmt = $db->prepare("INSERT INTO projects (user_id, project_name) VALUES (?, ?)");
-        if ($stmt->execute([$userId, $projectName])) {
-            $id = $db->lastInsertId();
-            return new Project([
-                'id'           => $id,
-                'user_id'      => $userId,
-                'project_name' => $projectName
-            ]);
+    public static function createTableIfNotExists(PDO $db) {
+        $sql = "CREATE TABLE IF NOT EXISTS projects (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            description TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )";
+        $db->exec($sql);
+    }
+
+    /**
+     * Busca un proyecto por su ID.
+     *
+     * @param PDO $db Conexión a la base de datos.
+     * @param int $id ID del proyecto.
+     * @return Project|null
+     */
+    public static function findById(PDO $db, int $id) {
+        $stmt = $db->prepare("SELECT * FROM projects WHERE id = ?");
+        $stmt->execute([$id]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($data) {
+            return new self($data);
         }
         return null;
     }
 
     /**
-     * Busca un proyecto específico basado en su ID y el ID del usuario.
+     * Guarda el proyecto en la base de datos.
+     * Si el proyecto tiene un ID, realiza una actualización; si no, inserta uno nuevo.
      *
-     * @param PDO $db         Instancia de la conexión a la base de datos.
-     * @param int $projectId  ID del proyecto a buscar.
-     * @param int $userId     ID del usuario propietario del proyecto.
-     *
-     * @return Project|null Retorna una instancia del proyecto encontrado o null si no se localiza.
+     * @param PDO $db Conexión a la base de datos.
      */
-    public static function findById(PDO $db, int $projectId, int $userId): ?Project {
-        $stmt = $db->prepare("SELECT * FROM projects WHERE id = ? AND user_id = ?");
-        $stmt->execute([$projectId, $userId]);
-        $data = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $data ? new Project($data) : null;
+    public function save(PDO $db) {
+        if ($this->id) {
+            // Actualiza el registro existente.
+            $stmt = $db->prepare("UPDATE projects SET title = ?, description = ? WHERE id = ?");
+            $stmt->execute([$this->title, $this->description, $this->id]);
+        } else {
+            // Inserta un nuevo registro.
+            $stmt = $db->prepare("INSERT INTO projects (title, description) VALUES (?, ?)");
+            $stmt->execute([$this->title, $this->description]);
+            $this->id = $db->lastInsertId();
+        }
     }
 
     /**
-     * Obtiene todos los proyectos asociados a un usuario específico.
+     * Convierte la instancia del proyecto a un arreglo asociativo.
      *
-     * @param PDO $db      Instancia de la conexión a la base de datos.
-     * @param int $userId  ID del usuario.
-     *
-     * @return Project[] Retorna un arreglo de instancias de Project.
+     * @return array Arreglo con los datos del proyecto.
      */
-    public static function getProjectsByUser(PDO $db, int $userId): array {
-        $stmt = $db->prepare("SELECT * FROM projects WHERE user_id = ?");
-        $stmt->execute([$userId]);
-        $projects = [];
-        while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $projects[] = new Project($data);
-        }
-        return $projects;
+    public function toArray(): array {
+        return [
+            'id'          => $this->id,
+            'title'       => $this->title,
+            'description' => $this->description,
+            'created_at'  => $this->created_at,
+        ];
     }
 }
