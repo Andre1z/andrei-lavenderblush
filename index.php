@@ -247,7 +247,7 @@ if (!usuarioConectado()):
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 2px 20px rgba(0,0,0,0.2);
-            max-width: 320px;
+            max-width: 355px;
             width: 100%;
         }
         h1 {
