@@ -42,8 +42,8 @@ SQL;
     // Insertar un usuario de demostración
     $stmt = $db->prepare("INSERT INTO users (name, email, username, password) VALUES (?, ?, ?, ?)");
     $stmt->execute([
-        'Andrei Buga',
-        'bugaandrei1@gmail.com',
+        'Jose Vicente Carratalá',
+        'info@josevicentecarratala.com',
         'andrei',
         'andrei'
     ]);
@@ -280,7 +280,7 @@ if ($proyectoActivo) {
 <head>
     <meta charset="utf-8">
     <title>andrei | lavenderblush - Multiproyecto</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
 <header>
@@ -294,7 +294,9 @@ if ($mensajeFlash):
 <div class="flash-msg"><?= htmlspecialchars($mensajeFlash) ?></div>
 <?php endif; ?>
 <div class="contenedor">
-    <nav>
+    <nav id="sideNav">
+        <!-- Botón para colapsar/desplegar el menú -->
+        <div id="toggleNav"></div>
         <h3>Proyectos</h3>
         <form method="post" action="?accion=crear_proyecto">
             <label for="nombre_proyecto">Nuevo proyecto</label>

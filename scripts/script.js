@@ -124,17 +124,19 @@ function cargarClases() {
     .catch(error => console.error("Error cargando clases:", error));
 }
 
-// Evento para filtrar clases mediante el campo de búsqueda
-document.getElementById("searchBox").addEventListener("input", function() {
-    const filtro = this.value.toLowerCase();
-    document.querySelectorAll("article.draggable").forEach(function(articulo) {
-        const nombre = articulo.querySelector(".nombre")?.textContent.toLowerCase();
-        articulo.style.display = (nombre && nombre.indexOf(filtro) !== -1) ? "" : "none";
-    });
-});
+// Función para alternar el estado del menú lateral (nav)
+function toggleNav() {
+    const nav = document.getElementById("sideNav");
+    nav.classList.toggle("collapsed");
+}
 
 // Configurar eventos una vez cargado el DOM
 document.addEventListener("DOMContentLoaded", function() {
+    // Evento del botón para plegar/desplegar el nav
+    document.getElementById("toggleNav").addEventListener("click", function(e) {
+        toggleNav();
+    });
+    
     document.getElementById("agregarClase").addEventListener("click", function(e) {
         e.preventDefault();
         const plantilla = document.getElementById("plantilla-clase");
