@@ -1,61 +1,87 @@
 <?php
-// app/helpers/functions.php
+/**
+ * app/helpers/functions.php
+ *
+ * Este archivo contiene funciones auxiliares para la aplicación, tales como la conexión
+ * a la base de datos SQLite, manejo de sesiones, redirección y mensajes flash.
+ */
 
-// Inicia la sesión si aún no se ha iniciado.
+// Inicia la sesión si aún no está iniciada.
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 /**
- * Obtiene y retorna una instancia PDO para la conexión con la base de datos SQLite.
- * Se utiliza el patrón singleton para que la conexión se establezca una sola vez.
+ * Retorna una conexión PDO a la base de datos SQLite.
+ * Si el archivo de la base de datos no existe, SQLite lo creará automáticamente.
+ * Además, se asegura de que la tabla "users" exista.
  *
  * @return PDO
  */
 function getDBConnection() {
-    static $db = null;
-    if ($db === null) {
-        // Construye la ruta al archivo SQLite. Se asume que se encuentra en "data/data.sqlite" en el directorio raíz.
-        $dbFile = __DIR__ . '/../../data/data.sqlite';
-        try {
-            $db = new PDO('sqlite:' . $dbFile);
-            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            die("Cannot connect to the SQLite database: " . $e->getMessage());
-        }
+    // Define la ruta del archivo de base de datos.
+    // Se almacenará en la carpeta "data" ubicada en la raíz del proyecto.
+    $db_path = __DIR__ . '/../../data/database.db';
+    
+    try {
+        // Crea una nueva instancia de PDO para SQLite.
+        $pdo = new PDO("sqlite:" . $db_path);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+        // Crea la tabla "users" si no existe.
+        $createUsersTableSQL = "CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            username TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL
+        )";
+        $pdo->exec($createUsersTableSQL);
+        
+        return $pdo;
+    } catch (PDOException $e) {
+        die("La conexión a la base de datos falló: " . $e->getMessage());
     }
-    return $db;
 }
 
 /**
- * Redirige a una URL determinada y detiene la ejecución del script.
+ * Verifica que el usuario haya iniciado sesión.
+ * Si no es así, establece un mensaje flash y redirige a la página de login.
+ */
+function require_login() {
+    if (!isset($_SESSION['user_id'])) {
+        set_flash_message("Debes iniciar sesión para acceder a esta página.", "error");
+        redirect("login.php");
+    }
+}
+
+/**
+ * Redirige a la URL indicada.
  *
- * @param string $url URL a la que se redirige.
- * @return void
+ * @param string $url La URL destino.
  */
 function redirect($url) {
     header("Location: " . $url);
-    exit;
+    exit();
 }
 
 /**
  * Establece un mensaje flash en la sesión.
  *
- * @param string $message El mensaje a mostrar.
- * @param string $type    El tipo de mensaje (por ejemplo, 'info', 'success', 'error').
- * @return void
+ * @param string $message El contenido del mensaje.
+ * @param string $type    El tipo de mensaje ("info", "success", "error").
  */
-function set_flash_message($message, $type = 'info') {
+function set_flash_message($message, $type = "info") {
     $_SESSION['flash_message'] = [
-        'message' => $message,
-        'type'    => $type
+        "message" => $message,
+        "type" => $type
     ];
 }
 
 /**
- * Recupera y elimina el mensaje flash almacenado en la sesión.
+ * Recupera y elimina el mensaje flash almacenado en la sesión, si existe.
  *
- * @return array|null Retorna un arreglo con las claves 'message' y 'type' o null si no hay mensaje.
+ * @return array|null  Un array asociativo con 'message' y 'type' o null si no existe.
  */
 function get_flash_message() {
     if (isset($_SESSION['flash_message'])) {
@@ -67,34 +93,10 @@ function get_flash_message() {
 }
 
 /**
- * Retorna el ID del usuario autenticado almacenado en la sesión.
+ * Retorna el ID del usuario que ha iniciado sesión o null si no hay ninguno.
  *
- * @return int
+ * @return int|null
  */
 function logged_in_user_id() {
-    return isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
-}
-
-/**
- * Verifica que el usuario haya iniciado sesión.
- * De no ser así, establece un mensaje flash y redirige al usuario a la página de login.
- *
- * @return void
- */
-function require_login() {
-    if (logged_in_user_id() === 0) {
-        set_flash_message("Debes iniciar sesión para acceder a esa página.", "error");
-        redirect('login.php');
-    }
-}
-
-/**
- * Función auxiliar para sanitizar datos de entrada.
- * Esta función elimina espacios adicionales, etiquetas HTML y convierte caracteres especiales.
- *
- * @param string $data Texto de entrada.
- * @return string Texto sanitizado.
- */
-function sanitize_input($data) {
-    return htmlspecialchars(strip_tags(trim($data)));
+    return $_SESSION['user_id'] ?? null;
 }
