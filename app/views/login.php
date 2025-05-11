@@ -27,7 +27,7 @@ $flash = get_flash_message();
                 <?php echo htmlspecialchars($flash['message']); ?>
             </div>
         <?php endif; ?>
-        <form method="post" action="/public/index.php">
+        <form method="post" action="index.php">
             <!-- Indica la acción para que el controlador sepa que debe procesar el login -->
             <input type="hidden" name="action" value="login">
             <label for="username">Usuario</label>
